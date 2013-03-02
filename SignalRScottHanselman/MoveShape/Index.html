@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <style>
+        #shape {
+            width: 100px;
+            height: 100px;
+            background-color: #0094ff;
+            cursor:move;
+        }
+    </style>
+</head>
+<body>
+    <div id="shape"/>
+    <script src="../Scripts/jquery-1.6.4.js"></script>
+    <script src="../Scripts/jquery.signalR-1.0.1.js"></script>
+    <script src="../Scripts/jquery-ui-1.10.1.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script>
+        $(function () {
+            var hub = $.connection.moveShape,
+                $shape = $("#shape");
+
+            //define ShapeMoved on client
+            hub.client.shapeMoved = function (x, y) {
+                $shape.css({ left: x, top: y });
+            };
+
+            //start connection and wire client interaction
+            //$.connection.hub is the connection over which all trafic
+            //will go through
+            $.connection.hub.start().done(
+                function () {
+                    $shape.draggable({
+                        drag: function () {
+                            hub.server.moveShape(this.offsetLeft, this.offsetTop || 0);
+                        }
+                    });
+                });
+        });
+    </script>
+</body>
+</html>
